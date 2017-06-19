@@ -7,3 +7,5 @@ const ProductList = React.createClass({
         );
     }
 });
+
+ReactDOM.render(<ProductList />, document.getElementById('content'));
