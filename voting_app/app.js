@@ -1,3 +1,19 @@
+class Product extends React.Component {
+    constructor (props) {
+        super(props);
+    }
+
+    render () {
+        return (
+            <div className="item">
+                <div className="image">
+                    <img src="https://facebook.github.io/react/img/logo.svg" />
+                </div>
+            </div>
+        );
+    }
+};
+
 class ProductList extends React.Component {
     constructor (props) {
         super(props)
@@ -6,7 +22,7 @@ class ProductList extends React.Component {
     render () {
         return (
             <div className='ui items'>
-                Hey there!
+                <Product />
             </div>
         );
     }
