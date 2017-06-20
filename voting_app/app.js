@@ -7,7 +7,7 @@ class Product extends React.Component {
         return (
             <div className="item">
                 <div className="image">
-                    <img src={this.props.image_url} />
+                    <img src={this.props.product_image_url} />
                 </div>
                 <div className="middle aligned content">
                     <div className="header">
@@ -23,7 +23,7 @@ class Product extends React.Component {
                     <div className="extra">
                         <span>Submitted by:</span>
                         <img className="ui avatar image"
-                            src={this.props.avatar_url}/>
+                            src={this.props.submitter_avatar_url}/>
                     </div>
                 </div>
             </div>
@@ -45,8 +45,9 @@ class ProductList extends React.Component {
                     title={product.title}
                     description={product.description}
                     votes={product.votes}
-                    avatar_url={product.submitter_avatar_url}
-                    image_url={product.picture_url}
+                    url={product.url}
+                    submitter_avatar_url={product.submitter_avatar_url}
+                    product_image_url={product.product_image_url}
                 />
             </div>
         );
