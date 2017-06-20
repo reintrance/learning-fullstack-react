@@ -1,4 +1,4 @@
-const data = [
+const MockData = [
   {
     "id": 0,
     "title": "dolore",
