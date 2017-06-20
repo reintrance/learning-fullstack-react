@@ -39,15 +39,45 @@ class Product extends React.Component {
 
 class ProductList extends React.Component {
     constructor (props) {
-        super(props)
+        super(props);
+
+        this.state = {
+            products: []
+        };
+
+        this.handleProductUpVote = this.handleProductUpVote.bind(this);
     }
 
-    handleProductUpVote (id) {
-        console.log(`Product with id ${id} just got upvote`);
+    // Changed it from componentDidMount to avoid double render, check if it causes problems in the future
+    componentWillMount () {
+        this.updateState();
+    }
+
+    handleProductUpVote (productId) {
+        this.updateUpVoteCounter(productId);
+    }
+
+    updateUpVoteCounter (productId) {
+        MockData.forEach(el => {
+            if (el.id === productId) {
+                el.votes += 1;
+                return;
+            }
+        });
+
+        this.updateState();
+    }
+
+    updateState () {
+        const products = MockData.sort((a, b) => {
+            return b.votes - a.votes;
+        });
+
+        this.setState({ products });
     }
 
     render () {
-        const products = MockData.map(product => {
+        const products = this.state.products.map(product => {
             return (
                 <Product
                     key={'product-' + product.id}
