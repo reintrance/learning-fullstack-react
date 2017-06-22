@@ -2,6 +2,8 @@
     'use strict';
     const DOWNVOTE_FLAG = '-';
     const UPVOTE_FLAG = '+';
+    const SORT_DIRECTION_DESC = 'DESC';
+    const SORT_DIRECTION_ASC = 'ASC';
 
     class Product extends React.Component {
         constructor (props) {
@@ -55,11 +57,13 @@
             super(props);
 
             this.state = {
+                sortDirection: SORT_DIRECTION_DESC,
                 products: []
             };
 
             this.handleProductUpVote = this.handleProductUpVote.bind(this);
             this.handleProductDownVote = this.handleProductDownVote.bind(this);
+            this.handleSortChange = this.handleSortChange.bind(this);
         }
 
         // Changed it from componentDidMount to avoid double render, check if it causes problems in the future
@@ -86,12 +90,25 @@
             this.updateState();
         }
 
-        updateState () {
-            const products = MockData.sort((a, b) => {
-                return b.votes - a.votes;
-            });
+        updateState (sortDirection) {
+            sortDirection = sortDirection || this.state.sortDirection;
+            const products = this.sortProducts(sortDirection);
 
-            this.setState({ products });
+            this.setState({
+                sortDirection,
+                products
+            });
+        }
+
+        sortProducts (sortDirection) {
+            return MockData.sort((a, b) => {
+                return sortDirection === SORT_DIRECTION_DESC ? b.votes - a.votes : a.votes - b.votes;
+            });
+        }
+
+        handleSortChange () {
+            const newSortDirection = this.state.sortDirection === SORT_DIRECTION_DESC ? SORT_DIRECTION_ASC : SORT_DIRECTION_DESC;
+            this.updateState(newSortDirection)
         }
 
         render () {
@@ -112,8 +129,14 @@
                 );
             });
             return (
-                <div className='ui items'>
-                    {products}
+                <div>
+                    <div className="ui bottom dividing">
+                        <span>Toggle sort direction: </span>
+                        <a href="javascript:void(0)" onClick={this.handleSortChange}>{this.state.sortDirection}</a>
+                    </div>
+                    <div className='ui items'>
+                        {products}
+                    </div>
                 </div>
             );
         }
