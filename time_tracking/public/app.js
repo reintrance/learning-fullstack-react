@@ -27,6 +27,19 @@
           "runningSince": 1456225941911
         }]
       };
+
+      this.handleCreateFormSubmit = this.handleCreateFormSubmit.bind(this);
+    }
+
+    handleCreateFormSubmit (timer) {
+      this.createTimer(timer);
+    }
+
+    createTimer (timer) {
+      const newTimer = helpers.newTimer(timer);
+      this.setState({
+        timers: this.state.timers.concat(newTimer)
+      });
     }
 
     render () {
@@ -36,7 +49,9 @@
             <EditableTimerList
               timers={this.state.timers}
             />
-            <ToggleableTimerForm />
+            <ToggleableTimerForm
+              onFormSubmit={this.handleCreateFormSubmit}
+            />
           </div>
         </div>
       );
@@ -73,6 +88,8 @@
       };
 
       this.handleFormOpen = this.handleFormOpen.bind(this);
+      this.handleFormClose = this.handleFormClose.bind(this);
+      this.handleFormSubmit = this.handleFormSubmit.bind(this);
     }
 
     handleFormOpen () {
@@ -81,10 +98,26 @@
       });
     }
 
+    handleFormClose () {
+      this.setState({
+        isOpen: false
+      });
+    }
+
+    handleFormSubmit (timer) {
+      this.props.onFormSubmit(timer);
+      this.setState({
+        isOpen: false
+      });
+    }
+
     render () {
       if (this.state.isOpen) {
         return (
-          <TimerForm />
+          <TimerForm
+            onFormSubmit={this.handleFormSubmit}
+            onFormClose={this.handleFormClose}
+          />
         );
       } else {
         return (
@@ -131,8 +164,22 @@
   }
 
   class TimerForm extends React.Component {
+    constructor (props) {
+      super(props);
+
+      this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    handleSubmit () {
+      this.props.onFormSubmit({
+        id: this.props.id,
+        title: this.refs.title.value,
+        project: this.refs.project.value
+      });
+    }
+
     render () {
-      const submitText = this.props.title ? 'Update' : 'Create';
+      const submitText = this.props.id ? 'Update' : 'Create';
 
       return (
         <div className='ui centered card'>
@@ -140,17 +187,17 @@
             <div className='ui form'>
               <div className='field'>
                 <label>Title</label>
-                <input type='text' defaultValue={this.props.title}/>
+                <input type='text' ref='title' defaultValue={this.props.title}/>
               </div>
               <div className='field'>
                 <label>Project</label>
-                <input type='text' defaultValue={this.props.project}/>
+                <input type='text' ref='project' defaultValue={this.props.project}/>
               </div>
               <div className='ui two bottom attached buttons'>
-                <button className='ui basic blue button'>
+                <button className='ui basic blue button' onClick={this.handleSubmit}>
                   {submitText}
                 </button>
-                <button className='ui basic red button'>
+                <button className='ui basic red button' onClick={this.props.onFormClose}>
                   Cancel
                 </button>
               </div>
