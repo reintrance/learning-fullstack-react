@@ -29,10 +29,20 @@
       };
 
       this.handleCreateFormSubmit = this.handleCreateFormSubmit.bind(this);
+      this.handleUpdateFormSubmit = this.handleUpdateFormSubmit.bind(this);
+      this.handleRemoveClick = this.handleRemoveClick.bind(this);
     }
 
     handleCreateFormSubmit (timer) {
       this.createTimer(timer);
+    }
+
+    handleUpdateFormSubmit (timer) {
+      this.updateTimer(timer)
+    }
+
+    handleRemoveClick (timerId) {
+      this.deleteTimer(timerId)
     }
 
     createTimer (timer) {
@@ -42,12 +52,37 @@
       });
     }
 
+    updateTimer (attrs) {
+      var updatedTimers = this.state.timers.map(timer => {
+        if (timer.id === attrs.id) {
+          return Object.assign({}, timer, {
+            title: attrs.title,
+            project: attrs.project
+          });
+        } else {
+          return timer;
+        }
+      });
+
+      this.setState({
+        timers: updatedTimers
+      });
+    }
+
+    deleteTimer (timerId) {
+      this.setState({
+        timers: this.state.timers.filter(timer => timer.id !== timerId)
+      })
+    }
+
     render () {
       return (
         <div className='ui three column centered grid'>
           <div className='column'>
             <EditableTimerList
               timers={this.state.timers}
+              onFormSubmit={this.handleUpdateFormSubmit}
+              onRemoveClick={this.handleRemoveClick}
             />
             <ToggleableTimerForm
               onFormSubmit={this.handleCreateFormSubmit}
@@ -69,6 +104,8 @@
             project={timer.project}
             elapsed={timer.elapsed}
             runningSince={timer.runningSince}
+            onFormSubmit={this.props.onFormSubmit}
+            onRemoveClick={this.props.onRemoveClick}
           />
         );
       });
@@ -138,6 +175,35 @@
       this.state = {
         editFormOpen: false
       };
+
+      this.handleFormOpen = this.handleFormOpen.bind(this);
+      this.handleFormClose = this.handleFormClose.bind(this);
+      this.handleFormSubmit = this.handleFormSubmit.bind(this);
+    }
+
+    handleFormOpen () {
+      this.openForm();
+    }
+
+    handleFormClose () {
+      this.closeForm();
+    }
+
+    handleFormSubmit (timer) {
+      this.props.onFormSubmit(timer);
+      this.closeForm();
+    }
+
+    openForm () {
+      this.setState({
+        editFormOpen: true
+      });
+    }
+
+    closeForm () {
+      this.setState({
+        editFormOpen: false
+      });
     }
 
     render () {
@@ -147,6 +213,8 @@
             id={this.props.id}
             title={this.props.title}
             project={this.props.project}
+            onFormSubmit={this.handleFormSubmit}
+            onFormClose={this.handleFormClose}
           />
         );
       } else {
@@ -157,6 +225,8 @@
             project={this.props.project}
             elapsed={this.props.elapsed}
             runningSince={this.props.runningSince}
+            onEditClick={this.handleFormOpen}
+            onRemoveClick={this.props.onRemoveClick}
           />
         );
       }
@@ -209,6 +279,16 @@
   }
 
   class Timer extends React.Component {
+    constructor (props) {
+      super(props);
+
+      this.handleRemoveClick = this.handleRemoveClick.bind(this);
+    }
+
+    handleRemoveClick () {
+      this.props.onRemoveClick(this.props.id)
+    }
+
     render () {
       const elapsedString = helpers.renderElapsedString(this.props.elapsed);
 
@@ -227,10 +307,10 @@
               </h2>
             </div>
             <div className="extra content">
-              <span className="right floated edit icon">
+              <span className="right floated edit icon" onClick={this.props.onEditClick}>
                 <i className="edit icon"></i>
               </span>
-              <span className="right floated trash icon">
+              <span className="right floated trash icon" onClick={this.handleRemoveClick}>
                 <i className="trash icon"></i>
               </span>
             </div>
