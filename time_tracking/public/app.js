@@ -283,14 +283,33 @@
       super(props);
 
       this.handleRemoveClick = this.handleRemoveClick.bind(this);
+      this.handleStartClick = this.handleStartClick.bind(this);
+      this.handleStopClick = this.handleStopClick.bind(this);
     }
 
     handleRemoveClick () {
       this.props.onRemoveClick(this.props.id)
     }
 
+    handleStartClick () {
+      this.props.onStartClick(this.props.id)
+    }
+
+    handleStopClick () {
+      this.props.onStopClick(this.props.id)
+    }
+
+    componentDidMount () {
+      this.forceUpdateInterval = setInterval(() => this.forceUpdate(), 50);
+    }
+
+    componentWillUnmount () {
+      clearInterval(this.forceUpdateInterval);
+    }
+
     render () {
-      const elapsedString = helpers.renderElapsedString(this.props.elapsed);
+
+      const elapsedString = helpers.renderElapsedString(this.props.elapsed, this.props.runningSince);
 
       return (
         <div className="ui centered card">
@@ -315,11 +334,31 @@
               </span>
             </div>
           </div>
-          <div className="ui bottom attached blue basic button">
-            Start
-          </div>
+          <TimerActionButton
+            timerIsRunning={!!this.props.runningSince}
+            onStartClick={this.handleStartClick}
+            onStopClick={this.handleStopClick}
+          />
         </div>
       );
+    }
+  }
+
+  class TimerActionButton extends React.Component {
+    render () {
+      if (this.props.timerIsRunning) {
+        return (
+          <div className="ui bottom attached red basic button" onClick={this.props.onStopClick}>
+            Stop
+          </div>
+        );
+      } else {
+        return (
+          <div className="ui bottom attached blue basic button" onClick={this.props.onStartClick}>
+            Start
+          </div>
+        );
+      }
     }
   }
 
