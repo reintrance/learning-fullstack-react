@@ -31,6 +31,8 @@
       this.handleCreateFormSubmit = this.handleCreateFormSubmit.bind(this);
       this.handleUpdateFormSubmit = this.handleUpdateFormSubmit.bind(this);
       this.handleRemoveClick = this.handleRemoveClick.bind(this);
+      this.handleStartClick = this.handleStartClick.bind(this);
+      this.handleStopClick = this.handleStopClick.bind(this);
     }
 
     handleCreateFormSubmit (timer) {
@@ -43,6 +45,50 @@
 
     handleRemoveClick (timerId) {
       this.deleteTimer(timerId)
+    }
+
+    handleStartClick (timerId) {
+      this.startTimer(timerId);
+    }
+
+    handleStopClick (timerId) {
+      this.stopTimer(timerId);
+    }
+
+    startTimer (timerId) {
+      const now = Date.now();
+      const updatedTimers = this.state.timers.map(timer => {
+        if (timer.id === timerId) {
+          return Object.assign({}, timer, {
+            runningSince: now
+          });
+        } else {
+          return timer;
+        }
+      });
+
+      this.setState({
+        timers: updatedTimers
+      });
+    }
+
+    stopTimer (timerId) {
+      var now = Date.now();
+      const updatedTimers = this.state.timers.map(timer => {
+        if (timer.id === timerId) {
+          const lastElapsed = now - timer.runningSince;
+          return Object.assign({}, timer, {
+            elapsed: timer.elapsed + lastElapsed,
+            runningSince: null
+          });
+        } else {
+          return timer;
+        }
+      });
+
+      this.setState({
+        timers: updatedTimers
+      });
     }
 
     createTimer (timer) {
@@ -83,6 +129,8 @@
               timers={this.state.timers}
               onFormSubmit={this.handleUpdateFormSubmit}
               onRemoveClick={this.handleRemoveClick}
+              onStartClick={this.handleStartClick}
+              onStopClick={this.handleStopClick}
             />
             <ToggleableTimerForm
               onFormSubmit={this.handleCreateFormSubmit}
@@ -106,6 +154,8 @@
             runningSince={timer.runningSince}
             onFormSubmit={this.props.onFormSubmit}
             onRemoveClick={this.props.onRemoveClick}
+            onStartClick={this.props.onStartClick}
+            onStopClick={this.props.onStopClick}
           />
         );
       });
@@ -227,6 +277,8 @@
             runningSince={this.props.runningSince}
             onEditClick={this.handleFormOpen}
             onRemoveClick={this.props.onRemoveClick}
+            onStartClick={this.props.onStartClick}
+            onStopClick={this.props.onStopClick}
           />
         );
       }
