@@ -334,9 +334,15 @@
     constructor (props) {
       super(props);
 
+      this.state = {
+        isControlsVisible: false
+      };
+
       this.handleRemoveClick = this.handleRemoveClick.bind(this);
       this.handleStartClick = this.handleStartClick.bind(this);
       this.handleStopClick = this.handleStopClick.bind(this);
+      this.showControls = this.showControls.bind(this);
+      this.hideControls = this.hideControls.bind(this);
     }
 
     handleRemoveClick () {
@@ -359,12 +365,27 @@
       clearInterval(this.forceUpdateInterval);
     }
 
+    showControls () {
+      this.setState({
+        isControlsVisible: true
+      });
+    }
+
+    hideControls () {
+      this.setState({
+        isControlsVisible: false
+      });
+    }
+
     render () {
 
       const elapsedString = helpers.renderElapsedString(this.props.elapsed, this.props.runningSince);
 
       return (
-        <div className="ui centered card">
+        <div
+          className="ui centered card"
+          onMouseEnter={this.showControls}
+          onMouseLeave={this.hideControls}>
           <div className="content">
             <div className="header">
               {this.props.title}
@@ -377,14 +398,11 @@
                 {elapsedString}
               </h2>
             </div>
-            <div className="extra content">
-              <span className="right floated edit icon" onClick={this.props.onEditClick}>
-                <i className="edit icon"></i>
-              </span>
-              <span className="right floated trash icon" onClick={this.handleRemoveClick}>
-                <i className="trash icon"></i>
-              </span>
-            </div>
+            <TimerControls
+              isControlsVisible={this.state.isControlsVisible}
+              onEditClick={this.props.onEditClick}
+              onRemoveclick={this.handleRemoveClick}
+            />
           </div>
           <TimerActionButton
             timerIsRunning={!!this.props.runningSince}
@@ -393,6 +411,25 @@
           />
         </div>
       );
+    }
+  }
+
+  class TimerControls extends React.Component {
+    render () {
+      if (this.props.isControlsVisible) {
+        return (
+          <div className="extra content">
+            <span className="right floated edit icon" onClick={this.props.onEditClick}>
+              <i className="edit icon"></i>
+            </span>
+            <span className="right floated trash icon" onClick={this.props.onRemoveclick}>
+              <i className="trash icon"></i>
+            </span>
+          </div>
+        );
+      } else {
+        return <div>&nbsp;</div>;
+      }
     }
   }
 
