@@ -289,15 +289,48 @@
     constructor (props) {
       super(props);
 
+      this.state = {
+        values: {
+          title: props.title,
+          project: props.project
+        },
+        validationErrors: []
+      }
+
+      this.inputs = {};
+
       this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     handleSubmit () {
-      this.props.onFormSubmit({
-        id: this.props.id,
-        title: this.refs.title.value,
-        project: this.refs.project.value
+      const values = {
+        title: this.inputs.title.value,
+        project: this.inputs.project.value
+      };
+      this.setState({values});
+
+      const isValid = this.validate();
+
+      if (isValid) {
+        const valuesToSubmit = Object.assign({
+          id: this.props.id
+        }, values);
+
+        this.props.onFormSubmit(valuesToSubmit);
+      }
+    }
+
+    validate () {
+      const fields = ['title', 'project'];
+      const validationErrors = fields.filter(field => {
+        return !this.inputs[field].value;
       });
+
+      this.setState({
+        validationErrors
+      });
+
+      return !validationErrors.length;
     }
 
     render () {
@@ -306,15 +339,19 @@
       return (
         <div className='ui centered card'>
           <div className='content'>
-            <div className='ui form'>
-              <div className='field'>
-                <label>Title</label>
-                <input type='text' ref='title' defaultValue={this.props.title}/>
-              </div>
-              <div className='field'>
-                <label>Project</label>
-                <input type='text' ref='project' defaultValue={this.props.project}/>
-              </div>
+            <div className={this.state.validationErrors.length ? "ui error form" : 'ui form'}>
+              <InputField
+                isValid={this.state.validationErrors.indexOf('title') === -1}
+                label='Title'
+                value={this.state.values.title}
+                inputRef={el => this.inputs.title = el}
+              />
+              <InputField
+                isValid={this.state.validationErrors.indexOf('project') === -1}
+                label='Project'
+                value={this.state.values.project}
+                inputRef={el => this.inputs.project = el}
+              />
               <div className='ui two bottom attached buttons'>
                 <button className='ui basic blue button' onClick={this.handleSubmit}>
                   {submitText}
@@ -327,6 +364,29 @@
           </div>
         </div>
       );
+    }
+  }
+
+  class InputField extends React.Component {
+    render () {
+      if (this.props.isValid) {
+        return (
+          <div className='field'>
+            <label>{this.props.label}</label>
+            <input type='text' ref={this.props.inputRef} defaultValue={this.props.value}/>
+          </div>
+        );
+      } else {
+        return (
+          <div className='field error'>
+            <div className="ui error message">
+              Value for {this.props.label} is not correct
+            </div>
+            <label>{this.props.label}</label>
+            <input type='text' ref={this.props.inputRef} defaultValue={this.props.value}/>
+          </div>
+        );
+      }
     }
   }
 
