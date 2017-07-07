@@ -2,30 +2,14 @@
 (function () {
   'use strict';
 
+  const UPDATE_TIMERS_INTERVAL_MS = 5000;
+
   class TimerDashboard extends React.Component {
     constructor (props) {
       super(props);
 
       this.state = {
-        timers: [{
-          "title": "Mow the lawn",
-          "project": "House Chores",
-          "elapsed": 5456099,
-          "id": "0a4a79cb-b06d-4cb1-883d-549a1e3b66d7"
-        },
-        {
-          "title": "Clear paper jam",
-          "project": "Office Chores",
-          "elapsed": 1273998,
-          "id": "a73c1d19-f32d-4aff-b470-cea4e792406a"
-        },
-        {
-          "title": "Ponder origins of universe",
-          "project": "Life Chores",
-          "id": "2c43306e-5b44-4ff8-8753-33c35adbd06f",
-          "elapsed": 11750,
-          "runningSince": 1456225941911
-        }]
+        timers: []
       };
 
       this.handleCreateFormSubmit = this.handleCreateFormSubmit.bind(this);
@@ -70,6 +54,11 @@
       this.setState({
         timers: updatedTimers
       });
+
+      client.startTimer({
+        id: timerId,
+        start: now
+      });
     }
 
     stopTimer (timerId) {
@@ -89,6 +78,11 @@
       this.setState({
         timers: updatedTimers
       });
+
+      client.stopTimer({
+        id: timerId,
+        stop: now
+      });
     }
 
     createTimer (timer) {
@@ -96,15 +90,19 @@
       this.setState({
         timers: this.state.timers.concat(newTimer)
       });
+
+      client.createTimer(newTimer);
     }
 
     updateTimer (attrs) {
-      var updatedTimers = this.state.timers.map(timer => {
+      let updatedTimer;
+      const updatedTimers = this.state.timers.map(timer => {
         if (timer.id === attrs.id) {
-          return Object.assign({}, timer, {
+          updatedTimer = Object.assign({}, timer, {
             title: attrs.title,
             project: attrs.project
           });
+          return updatedTimer;
         } else {
           return timer;
         }
@@ -113,12 +111,33 @@
       this.setState({
         timers: updatedTimers
       });
+
+      client.updateTimer(updatedTimer);
     }
 
     deleteTimer (timerId) {
       this.setState({
         timers: this.state.timers.filter(timer => timer.id !== timerId)
+      });
+
+      client.deleteTimer({
+        id: timerId
+      });
+    }
+
+    loadTimersFromServer () {
+      client.getTimers(timers => {
+        this.setState({ timers });
       })
+    }
+
+    componentDidMount () {
+      this.loadTimersFromServer();
+      this.updateTimersInterval = setInterval(this.loadTimersFromServer.bind(this), UPDATE_TIMERS_INTERVAL_MS);
+    }
+
+    componentWillUnmount () {
+      clearInterval(this.updateTimersInterval);
     }
 
     render () {
