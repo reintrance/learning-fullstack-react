@@ -9,7 +9,9 @@
       super(props);
 
       this.state = {
-        timers: []
+        timers: [],
+        serverError: {},
+        submitErrors: []
       };
 
       this.handleCreateFormSubmit = this.handleCreateFormSubmit.bind(this);
@@ -39,6 +41,12 @@
       this.stopTimer(timerId);
     }
 
+    handleServerError (error) {
+      this.setState({
+        serverError: error
+      });
+    }
+
     startTimer (timerId) {
       const now = Date.now();
       const updatedTimers = this.state.timers.map(timer => {
@@ -58,7 +66,7 @@
       client.startTimer({
         id: timerId,
         start: now
-      });
+      }).catch(this.handleServerError.bind(this));;
     }
 
     stopTimer (timerId) {
@@ -82,7 +90,7 @@
       client.stopTimer({
         id: timerId,
         stop: now
-      });
+      }).catch(this.handleServerError.bind(this));;
     }
 
     createTimer (timer) {
@@ -91,7 +99,7 @@
         timers: this.state.timers.concat(newTimer)
       });
 
-      client.createTimer(newTimer);
+      client.createTimer(newTimer).catch(this.handleServerError.bind(this));
     }
 
     updateTimer (attrs) {
@@ -112,7 +120,7 @@
         timers: updatedTimers
       });
 
-      client.updateTimer(updatedTimer);
+      client.updateTimer(updatedTimer).catch(this.handleServerError.bind(this));
     }
 
     deleteTimer (timerId) {
@@ -122,13 +130,13 @@
 
       client.deleteTimer({
         id: timerId
-      });
+      }).catch(this.handleServerError.bind(this));;
     }
 
     loadTimersFromServer () {
       client.getTimers(timers => {
         this.setState({ timers });
-      })
+      }).catch(this.handleServerError.bind(this));
     }
 
     componentDidMount () {
@@ -142,21 +150,38 @@
 
     render () {
       return (
-        <div className='ui three column centered grid'>
-          <div className='column'>
-            <EditableTimerList
-              timers={this.state.timers}
-              onFormSubmit={this.handleUpdateFormSubmit}
-              onRemoveClick={this.handleRemoveClick}
-              onStartClick={this.handleStartClick}
-              onStopClick={this.handleStopClick}
-            />
-            <ToggleableTimerForm
-              onFormSubmit={this.handleCreateFormSubmit}
-            />
+        <div>
+          <ErrorNotification error={this.state.serverError.message} />
+          <div className='ui three column centered grid'>
+            <div className='column'>
+              <EditableTimerList
+                timers={this.state.timers}
+                onFormSubmit={this.handleUpdateFormSubmit}
+                onRemoveClick={this.handleRemoveClick}
+                onStartClick={this.handleStartClick}
+                onStopClick={this.handleStopClick}
+              />
+              <ToggleableTimerForm
+                onFormSubmit={this.handleCreateFormSubmit}
+              />
+            </div>
           </div>
         </div>
       );
+    }
+  }
+
+  class ErrorNotification extends React.Component {
+    render () {
+      if (this.props.error) {
+        return (
+          <div className="ui inverted red segment">
+            <p>{this.props.error}</p>
+          </div>
+        );
+      } else {
+        return null;
+      }
     }
   }
 
