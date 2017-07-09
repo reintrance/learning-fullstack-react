@@ -42,8 +42,7 @@ class BasicInput extends React.Component {
             type='text'
             placeholder='name'
             value={this.state.name}
-            onChange={this.handleNameChange.bind(this)}
-            ref={el => this.inputNameRef = el}/>
+            onChange={this.handleNameChange.bind(this)}/>
 
             <button type='submit'>Submit</button>
         </form>
