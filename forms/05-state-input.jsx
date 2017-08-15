@@ -26,7 +26,7 @@ class BasicInput extends React.Component {
   handleNameChange (e) {
     const name = e.target.value;
 
-    this.setState({ name });
+    this.setState({ name }, () => console.log(this.state));
   }
 
   render () {
