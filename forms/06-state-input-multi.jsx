@@ -9,7 +9,10 @@ class BasicInput extends React.Component {
 
     this.state = {
       users: [],
-      fields: {}
+      fields: {
+        name: '',
+        email: ''
+      }
     }
   }
 
@@ -20,10 +23,10 @@ class BasicInput extends React.Component {
     this.setState({
       users: [...this.state.users, user],
       fields: {
-        name: undefined,
-        email: undefined
+        name: '',
+        email: ''
       }
-    }, () => console.log(this.state));
+    });
   }
 
   handleInputChange (e) {
@@ -31,7 +34,7 @@ class BasicInput extends React.Component {
       [e.target.name]: e.target.value
     });
 
-    this.setState({ fields }, () => console.log(this.state));
+    this.setState({ fields });
   }
 
   render () {
