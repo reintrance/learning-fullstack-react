@@ -11,11 +11,11 @@ import Seven from './07-basic-validation.jsx';
 import Eight from './08-field-component-form.jsx';
 import Nine from './09-async-fetch.jsx';
 import Ten from './10-remote-persist.jsx';
-// import Eleven from './11-redux-app.jsx';
+import Eleven from './11-redux-app.jsx';
 
 const routes = [
   One, Two, Three, Four, Five,
-  Six, Seven, Eight, Nine, Ten
+  Six, Seven, Eight, Nine, Ten, Eleven
 ];
 
 const location = window.location;
